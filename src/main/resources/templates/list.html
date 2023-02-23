@@ -18,7 +18,7 @@
     <div class="login-info">
         <div class="container">
           <span class="login-info_user" th:if="${loginInfo != null}">
-            <span>남기혁</span>
+            <span th:text="${loginInfo.name}"></span>
           </span>
             <span class="login-info_logout" th:if="${loginInfo != null}">
             <a href="/logout">로그아웃</a>
@@ -76,7 +76,8 @@
             </table>
         </div>
         <div>
-            <a href="/writeForm">글쓰기</a>
+            <a href="/writeForm" th:if="${loginInfo != null}">글쓰기</a>
+            <span th:if="${loginInfo == null}">글쓰기</span>
         </div>
     </div>
 </section>
