@@ -1,5 +1,6 @@
 package com.example.boardservice.controller;
 
+import com.example.boardservice.dto.Board;
 import com.example.boardservice.dto.LoginInfo;
 import com.example.boardservice.service.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -19,22 +21,36 @@ public class BoardController {
     // http://localhost:8080/
     // list를 리턴한다는 것은 classpath:/template/list.html을 사용한다는 것이다.
     @GetMapping("/")
-    public String list(HttpSession session, Model model) {
+    public String list(@RequestParam(name = "page", defaultValue = "1")int page, HttpSession session, Model model) {
         // 게시물 목록 읽어오기
         // 페이징 처리
         LoginInfo loginInfo = (LoginInfo)session.getAttribute("loginInfo");
         model.addAttribute("loginInfo", loginInfo); // 템플릿에게 loinInfo값을 넘긴다.
+
+//        페이지처리
+        int totalCount = boardService.getTotalCount(); //전체 게시물 수를 가져온다.
+        List<Board> list = boardService.getBoards(page); // 만약 page가 1이면 글 번호가 1,2,3,4....10의 자료를 리턴
+        int pageCount = totalCount / 10;
+        if(totalCount % 10 > 0) {
+            pageCount++;
+        }
+        int currentPage = page;
+
+//                데이터 10건을 제대로 가져오는지 테스트
+        for(Board board : list) {
+        }
+        model.addAttribute("list", list);
+        model.addAttribute("pageCount", pageCount);
+        model.addAttribute("currentPage", currentPage);
         return "list";
     }
 
 //    http:localhost:8080/board?id=(?) id에 값이 들어오면 id=값 형태로 된다.
     @GetMapping("/board")
-    public String board(@RequestParam("id") int id) {
-        System.out.println("id :" + id);
+    public String board(@RequestParam("boardId") int boardId, Model model) {
 
         //id에 해당하는 게시물을 읽어온다.
         //id에 해당하는 게시물의 조회수가 1증가한다.
-        return "board";
     }
 
     // 삭제한다. 관리자는 모든 글을 삭제할 수 있다.
@@ -66,8 +82,6 @@ public class BoardController {
             return "redirect:/loginForm";
         }
 
-        System.out.println("title:"+title);
-        System.out.println("content:"+content);
         //로그인 한 회원 정보 + 제목, 내용을 저장한다.
         boardService.addBoard(loginInfo.getUserId(), title, content);
         //리스트 보기로 리다이렉트한다.

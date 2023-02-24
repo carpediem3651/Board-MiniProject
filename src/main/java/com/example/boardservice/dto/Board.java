@@ -16,4 +16,5 @@ public class Board {
     private int userId;
     private LocalDateTime regdate;
     private int viewCnt;
+    private String name; //Join을 위한 칼럼추가
 }

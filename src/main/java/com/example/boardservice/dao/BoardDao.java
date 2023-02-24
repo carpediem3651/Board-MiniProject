@@ -1,7 +1,8 @@
 package com.example.boardservice.dao;
 
 import com.example.boardservice.dto.Board;
-import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -12,6 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
 
 @Repository
 public class BoardDao {
@@ -38,4 +42,23 @@ public class BoardDao {
         SqlParameterSource params = new BeanPropertySqlParameterSource(board);
         insertBoard.execute(params);
     }
+
+//전체 게시물 수
+    @Transactional(readOnly = true)
+    public int getTotalCount() {
+        String sql = "select count(*) as total_count from board";
+        Integer totalCount = jdbcTemplate.queryForObject(sql, Map.of(), Integer.class); //Integer.class는 타입을 의미
+        return totalCount.intValue(); //정수값이 하나 리턴된다.
+    }
+
+    @Transactional(readOnly = true)
+    public List<Board> getBoards(int page) {
+//      start 0,10,20,30는 1page, 2page, 3page, 4page를 나타낸다.
+        int start = (page - 1) * 10;
+        String sql = "select b.user_id, b.board_id, b.title, b.regdate, b.view_cnt, u.name from board b, user u where b.user_id = u.user_id order by board_id desc limit :start, 10";
+        RowMapper<Board> rowMapper = BeanPropertyRowMapper.newInstance(Board.class);
+        List<Board> list = jdbcTemplate.query(sql, Map.of("start", start), rowMapper);
+        return list;
+    }
+
 }

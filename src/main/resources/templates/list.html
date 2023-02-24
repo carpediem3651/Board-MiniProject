@@ -41,36 +41,19 @@
                     <th scope="col" class="th-num">번호</th>
                     <th scope="col" class="th-title">제목</th>
                     <th scope="col" class="th-viewcnt">조회수</th>
+                    <th scope="col" class="th-name">작성자</th>
                     <th scope="col" class="th-date">등록일</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>3</td>
+                <tr th:each="board : ${list}">
+                    <td th:text="${board.boardId}"></td>
                     <th>
-                        <a href="/board?id=3">제목1</a>
-                        <p>테스트</p>
+                        <a th:href="@{/board(boardId=${board.boardId})}" th:text="${board.title}"></a>
                     </th>
-                    <td>1</td>
-                    <td>2017.07.13</td>
-                </tr>
-
-                <tr>
-                    <td>2</td>
-                    <th>
-                        <a href="/board?id=2">제목2</a>
-                    </th>
-                    <td>0</td>
-                    <td>2017.06.15</td>
-                </tr>
-
-                <tr>
-                    <td>1</td>
-                    <th>
-                        <a href="/board?id=1">제목3</a>
-                    </th>
-                    <td>1</td>
-                    <td>2017.06.15</td>
+                    <td th:text="${board.viewCnt}"></td>
+                    <td th:text="${board.name}"></td>
+                    <td th:text="${board.regdate}"></td>
                 </tr>
                 </tbody>
             </table>
@@ -78,6 +61,9 @@
         <div>
             <a href="/writeForm" th:if="${loginInfo != null}">글쓰기</a>
             <span th:if="${loginInfo == null}">글쓰기</span>
+        </div>
+        <div>
+            <span th:each="num : ${#numbers.sequence(1, pageCount)}"><a th:href="@{/(page=${num})}" th:text="${num}"></a></span>
         </div>
     </div>
 </section>

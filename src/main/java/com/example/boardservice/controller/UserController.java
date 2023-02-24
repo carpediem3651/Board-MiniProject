@@ -29,10 +29,6 @@ public class UserController {
             @RequestParam("email") String email,
             @RequestParam("password") String password
     ) {
-        System.out.println("name : " + name);
-        System.out.println("email : " + email);
-        System.out.println("password : " + password); //@RequestParam 값이 잘 넘어 왔는지 확인
-
         //회원 정보를 저장한다.
         userService.addUser(name,email,password);
         return "redirect:/welcome"; // http://localhost:8080/welcom으로 이동
@@ -57,9 +53,6 @@ public class UserController {
     )
 
     {
-
-        System.out.println("email :" + email);
-        System.out.println("password: " + password);
 
         // email에 해당하는 회원 정보를 읽어온 후
         // 암호가 맞다면 세션에 회원정보를 저장한다.
