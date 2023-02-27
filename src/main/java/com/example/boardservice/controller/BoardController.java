@@ -47,10 +47,20 @@ public class BoardController {
 
 //    http:localhost:8080/board?id=(?) id에 값이 들어오면 id=값 형태로 된다.
     @GetMapping("/board")
-    public String board(@RequestParam("boardId") int boardId, Model model) {
+    public String board(@RequestParam("boardId") int boardId, Model model, HttpSession session) {
+
+        LoginInfo loginInfo = (LoginInfo)session.getAttribute("loginInfo"); // 세션에서 로그인 정보를 가져온다
+
+        if(loginInfo == null) { // 세션에 로그인 정보가 없으면 즉, 로그인 정보가 틀릴경우 /loginform으로 redirect한다.
+            return "redirect:/loginForm";
+        }
 
         //id에 해당하는 게시물을 읽어온다.
         //id에 해당하는 게시물의 조회수가 1증가한다.
+        Board board = boardService.getBoard(boardId);
+        model.addAttribute("board", board);
+        model.addAttribute("loginInfo", loginInfo);
+        return "board";
     }
 
     // 삭제한다. 관리자는 모든 글을 삭제할 수 있다.
@@ -86,5 +96,20 @@ public class BoardController {
         boardService.addBoard(loginInfo.getUserId(), title, content);
         //리스트 보기로 리다이렉트한다.
         return "redirect:/";
+    }
+
+    @GetMapping("/delete")
+    public String delete(
+            @RequestParam("boardId") int boardId,
+            HttpSession session
+    ) {
+        LoginInfo loginInfo = (LoginInfo)session.getAttribute("loginInfo"); // 세션에서 로그인 정보를 가져온다
+        if(loginInfo == null) { // 세션에 로그인 정보가 없으면 즉, 로그인 정보가 틀릴경우 /loginform으로 redirect한다.
+            return "redirect:/loginForm";
+        }
+//      loginInfo.getUserId() 사용자가 쓴 글일 경우에만 삭제한다.
+        boardService.deleteBoard(loginInfo.getUserId(), boardId);
+
+        return "redirect:/"; //삭제 후 리스트보기로 redirect한다.
     }
 }
