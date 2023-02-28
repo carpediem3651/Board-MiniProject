@@ -108,7 +108,12 @@ public class BoardController {
             return "redirect:/loginForm";
         }
 //      loginInfo.getUserId() 사용자가 쓴 글일 경우에만 삭제한다.
-        boardService.deleteBoard(loginInfo.getUserId(), boardId);
+        List<String> roles = loginInfo.getRoles();
+        if(roles.contains("ROLE_ADMIN")) {
+            boardService.deleteBoard(boardId);
+        } else {
+            boardService.deleteBoard(loginInfo.getUserId(), boardId);
+        }
 
         return "redirect:/"; //삭제 후 리스트보기로 redirect한다.
     }

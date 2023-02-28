@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor //lombok이 final 필드를 초기화하는 생성자를 자동으로 생성한다. 생성자 생성을 생략시킴
 public class UserService {
@@ -31,5 +33,10 @@ public class UserService {
     @Transactional
     public User getUser(String email) {
         return userDao.getUser(email);
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> getRoles(int userId) {
+        return userDao.getRoles(userId);
     }
 }
