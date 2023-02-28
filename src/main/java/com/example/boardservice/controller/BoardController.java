@@ -112,4 +112,39 @@ public class BoardController {
 
         return "redirect:/"; //삭제 후 리스트보기로 redirect한다.
     }
+
+    @GetMapping("/updateForm")
+    public String update(@RequestParam("boardId") int boardId, Model model, HttpSession session) {
+        LoginInfo loginInfo = (LoginInfo)session.getAttribute("loginInfo"); // 세션에서 로그인 정보를 가져온다
+        if(loginInfo == null) { // 세션에 로그인 정보가 없으면 즉, 로그인 정보가 틀릴경우 /loginform으로 redirect한다.
+            return "redirect:/loginForm";
+        }
+//        boardId에 해당하는 정보를 읽어와 updateForm 템플릿에게 전달
+//        viewCnt는 증가하지 않는다. 이를 위해 service를 수정한다.
+        Board board = boardService.getBoard(boardId, false);
+        model.addAttribute("board", board);
+        model.addAttribute("loginInfo", loginInfo);
+        return "updateForm";
+    }
+
+    @PostMapping("/update")
+    public String update(
+            @RequestParam("boardId") int boardId,
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
+            HttpSession session
+                         ) {
+        LoginInfo loginInfo = (LoginInfo)session.getAttribute("loginInfo"); // 세션에서 로그인 정보를 가져온다
+        if(loginInfo == null) { // 세션에 로그인 정보가 없으면 즉, 로그인 정보가 틀릴경우 /loginform으로 redirect한다.
+            return "redirect:/loginForm";
+        }
+//        boardId에 해당하는 글의 제목과 내용을 수정. html에서 hidden으로 받음
+//        글쓴이만 수정가능.
+        Board board = boardService.getBoard(boardId, false);
+        if(board.getUserId() != loginInfo.getUserId()) {
+            return "redirect:/board?boardId=" + boardId;
+        }
+        boardService.updateBoard(boardId, title, content);
+        return "redirect:/board?boardId=" + boardId; // 수정된 글 보기로 리다이렉트 한다.
+    }
 }
